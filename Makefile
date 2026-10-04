@@ -1,7 +1,7 @@
-all: matrix
+all: client server
 
 CC=gcc
-CFLAGS=-I. -lm
+CFLAGS=-I. -lm -g
 
 %.o: %.c 
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -14,4 +14,4 @@ server: server.o game.o save.o
 
 clean:
 	rm *.o
-	rm matrix
+	rm server client
