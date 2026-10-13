@@ -10,7 +10,7 @@ You will have to use the POSIX networking API to create a server and client prog
 
 As this is the last C project of cx651, you will get to make more design choices yourself! Carefully plan how you will implement each feature and the data structures you will need.
 
-# Implementing the Game Logic
+# Step 1: Implementing the Game Logic
 
 The game of connect four is simple. Players take turns placing pieces in a chosen column. When a column is chosen, the piece drops down to the bottom of that column, possibly stacking onto earlier placed pieces.
 
@@ -37,8 +37,7 @@ int check_win(struct game* g) {
 }
  
 /*
-Allocates a new game board.
-Returns a pointer to the newly allocated board.
+Initializes an existing game with an empty board.
 */
 void new_game(struct game* g, int gameId) {
    
@@ -46,7 +45,7 @@ void new_game(struct game* g, int gameId) {
 ```
 
 
-## Make the Board
+## Step 1a: Make the Board
 
 It is up to you how you want to represent your game board. For inspiration, consider how we represent images in a3. 
 A standard board for connect4 has 7 columns and 6 rows. 
@@ -57,7 +56,7 @@ A standard board for connect4 has 7 columns and 6 rows.
 > [!IMPORTANT]
 > - Task: Implement the logic that creates a new game in `game.c`.
 
-## Placing Pieces
+## Step 1b: Placing Pieces
 
 We now will implement the logic of making a move on our game board.
 
@@ -90,14 +89,14 @@ Making a move should also update bookkeeping on whose turn it currently is.
 > - Task: Implement the logic that allows a player to place a piece in a given chosen column in `game.c`.
 
 
-## Win Detection
+## Step 1c: Win Detection
 
 A player wins a game of connect4 by connecting four pieces horizontally, vertically, or diagonally.
 
 > [!IMPORTANT]
 > - Task: Implement the logic that checks if either player has won the game.
 
-# Adding Networking
+# Step 2: Adding Networking
 
 This project will involve at least three processes running simultaneously:
 - A server
@@ -107,9 +106,9 @@ As you start to structure your server, eventually you will want to support more 
 
 You will use the functions `recvfrom` to receive messages and `sendto` to send messages. The messages can send any bytes you wish to implement the correct functionality.
 
-## Server Setup
+## Step 2a: Server Setup
 
-In the provided `server.c` code their is a skeleton which sets up the socket and port.
+In the provided `server.c` code there is a skeleton which sets up the socket and port.
 
 You will need to implement the server's logic loop that continually:
 - `recvfrom` incoming clients on the open port.
@@ -117,7 +116,7 @@ You will need to implement the server's logic loop that continually:
   - for example, when your opponent makes a move, both players should receive the resulting move and print the board out.
 
 
-## Client Setup
+## Step 2b: Client Setup
 
 On starting a game, the client is prompted:
 ```
@@ -135,7 +134,7 @@ Connect 4
 
 After both players have joined, they can now send moves and play the game!
 
-## Client Moves
+## Step 2c: Client Moves
 
 The client interface will be a CLI interface where clients are allowed to type in their moves. These moves will be transmitted to the server. Then, the client will display the resulting board and wait for a message from the server about their opponents move.
 
@@ -421,17 +420,17 @@ You can test your code by opening three terminal panes. You may want to use `tmu
 In one window run `./server` and in the other two run `./client`.
 
 
-## Unreliable Delivery
+## Step 2d: Unreliable Delivery
 
 It is OK if your implementation can not handle dropped or lost messages. In fact, the networking protocol this code uses, UDP, is unreliable!
 
 The `test.sh` test suite does not try to force message drops and since we are testing locally, it is unlikely to occur. 
 
 > [!IMPORTANT]
-> - Task: Based on your implementation, what happens if a message from client to server is dropped? What happens if a message from client to server is dropped? 
+> - Task: Based on your implementation, what happens if a message from client to server is dropped? What happens if a message from server to client is dropped? 
 > - Describe what behavior you would expect to see in `questions.txt`. Label your answer `(1)`.
 
-# Testing
+# Step 3: Testing
 
 At this point running `./test.sh` should pass `t1,t2,t3`.
 
@@ -458,13 +457,13 @@ A summary of each test is below:
 > [!IMPORTANT]
 > - Task: Verify your code passes the expected tests when running `./test.sh`
 
-# Multiple Ongoing Games
+# Step 4: Multiple Ongoing Games
 
 > [!IMPORTANT]
 > - Task: Modify your code such that two ongoing games can occur simultaneously. Assigned GameIds should increases monotonically starting from 0. 
 > - Task: Verify your code passes the `t4` when running `./test.sh`
 
-# Saving and Loading Games
+# Step 5: Saving and Loading Games
 
 We want to make our server **fault tolerant** by saving game data to disk. After a move is made, save the game to a file. 
 
@@ -477,14 +476,14 @@ To start the server in recovery mode, populate the `argv[1]` field as follows:
 
 Without argv[1], start the server without recovery mode.
 
-## Saving a Game to File
+## Step 5a: Saving a Game to File
 
 After every move made, we should update the saved version of the game's file.
 
 > [!IMPORTANT]
-> Task: Implement the logic in `server.c` and `save.c` that saves game file to an in-memory game struct after every move.
+> Task: Implement the logic in `server.c` and `save.c` that saves an in-memory game struct to a game file after every move.
 
-## Loading a Game from a File
+## Step 5b: Loading a Game from a File
 
 When your server starts up in `recovery mode`, in main, the first thing we should do is call `loadgame`, which loads a specified file path into the server's memory. 
 
@@ -494,7 +493,7 @@ You are free to name the disk file as you please and format the file as you wish
 > Task: Implement the logic in `server.c` and `save.c` that loads the save game file to an in-memory game struct.
 > - Task: Verify your code passes the `t5` when running `./test.sh`
 
-## Lack of Robustness
+## Step 5c: Lack of Robustness
 
 We have implemented a very bare-bones system for fault tolerance. Let's now consider where our savegame and loadgame functionality falls short.
 
@@ -502,7 +501,7 @@ We have implemented a very bare-bones system for fault tolerance. Let's now cons
 > - Task: In what scenarios would our approach from savegame and loadgame not function as expected? Analyze and short-comings or limitations of the save/load functionality in `questions.txt` and label your answer `(2)`.
 
 
-## Submitting on Gradescope
+# Step 6: Submitting on Gradescope
 
 To submit on Gradescope, submit all the files in this directory to the assignment upload.
 
